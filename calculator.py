@@ -67,7 +67,7 @@ def tokenize(inp: str) -> list:
             try:
                 out.append(float(num))
             except ValueError:
-                raise IOError("Invalid number " + str(out) + ".")
+                raise IOError("Invalid number " + str(num) + ".")
         elif c.isalpha():
             ident = ""
             while index < len(inp) and inp[index].isalnum():

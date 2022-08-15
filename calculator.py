@@ -70,7 +70,7 @@ def tokenize(inp: str) -> list:
                 raise IOError("Invalid number " + str(num) + ".")
         elif c.isalpha():
             ident = ""
-            while index < len(inp) and inp[index].isalnum():
+            while index < len(inp) and inp[index].isalpha():
                 ident += inp[index]
                 index += 1
             index -= 1
@@ -124,7 +124,8 @@ def parse_term(tokens) -> float:
                     else:
                         raise IOError("Invalid operation " + str(op) + ".")
                 else:
-                    break
+                    nex = parse_pow(tokens)
+                    v = v * nex
             else:
                 break
         except IndexError:

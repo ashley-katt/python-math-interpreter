@@ -139,7 +139,7 @@ def parse_pow(tokens) -> float:
             if len(tokens) > 0:
                 if tokens[0] in POWOP:
                     op = tokens.pop(0)
-                    nex = parse_term(tokens)
+                    nex = parse_value(tokens)
                     if op == "^":
                         v = math.pow(v, nex)
                     else:

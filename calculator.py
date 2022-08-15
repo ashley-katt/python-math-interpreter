@@ -4,7 +4,7 @@ BASE_TOKENS = ["(", ")", "+", "-", "/", "*", "^"]
 ADDOP = ["+", "-"]
 MULOP = ["*", "/"]
 POWOP = ["^"]
-defined = {
+defined_functions = {
     "sin": lambda x: math.sin(x),
     "cos": lambda x: math.cos(x),
     "tan": lambda x: math.tan(x),
@@ -171,9 +171,9 @@ def parse_value(tokens) -> float:
                     inner.append(nex)
             return parse_eq(inner)
         elif type(n) is str:
-            if defined.__contains__(n):
+            if defined_functions.__contains__(n):
                 nex = parse_pow(tokens)
-                return defined[n](nex)
+                return defined_functions[n](nex)
             else:
                 raise IOError("Unrecognized function \"" + str(n) + "\".")
         else:

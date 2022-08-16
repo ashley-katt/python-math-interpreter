@@ -17,6 +17,23 @@ def help_cmd():
     print(helpMsg)
 
 
+helpMsg = """
+
+Commands:
+  help         - Displays this message
+  memory       - Shows all variables in memory
+
+Math Functions:
+  a+b, a-b, a*b, a/b, a^b
+  sin(x), cos(x), tan(x), csc(x), sec(x), cot(x), 
+  asin(x), acos(x), atan(x), acsc(x), asec(x), acot(x), 
+  abs(x), sqrt(x), rad(x), deg(x)
+
+Special Variables:
+  SHOW_TOKENS  - If nonzero, will show the found tokens after parsing an expression.
+"""
+
+
 def memory_cmd():
     for m in memory:
         print(str(m) + " = " + str(memory[m]))
@@ -45,19 +62,3 @@ functions = {
     "rad": lambda x: math.radians(x),
     "deg": lambda x: math.degrees(x),
 }
-
-helpMsg = """
-
-Commands:
-  help         - Displays this message
-  memory       - Shows all variables in memory
-
-Math Functions:
-  a+b, a-b, a*b, a/b, a^b
-  sin(x), cos(x), tan(x), csc(x), sec(x), cot(x), 
-  asin(x), acos(x), atan(x), acsc(x), asec(x), acot(x), 
-  abs(x), sqrt(x), rad(x), deg(x)
-
-Special Variables:
-  SHOW_TOKENS  - If nonzero, will show the found tokens after parsing an expression.
-"""

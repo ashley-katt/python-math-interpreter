@@ -18,7 +18,6 @@ def help_cmd():
 
 
 helpMsg = """
-
 Commands:
   help         - Displays this message
   memory       - Shows all variables in memory

@@ -1,9 +1,29 @@
 import math
 
-BASE_TOKENS = ["(", ")", "+", "-", "/", "*", "^"]
+BASE_TOKENS = ["(", ")", "+", "-", "/", "*", "^", "="]
 ADDOP = ["+", "-"]
 MULOP = ["*", "/"]
 POWOP = ["^"]
+memory = {
+    "SHOW_TOKENS": 0
+}
+
+
+def help_cmd():
+    print(helpMsg)
+
+
+def memory_cmd():
+    for m in memory:
+        print(str(m) + " = " + str(memory[m]))
+
+
+shell_functions = {
+    "help": help_cmd,
+    "memory": memory_cmd,
+}
+
+
 defined_functions = {
     "sin": lambda x: math.sin(x),
     "cos": lambda x: math.cos(x),
@@ -25,29 +45,19 @@ defined_functions = {
 
 
 helpMsg = """
-92      - Number
-92.5    - Number
-a+b     - Sum of a and b
-a-b     - Difference of a and b
-a*b     - Product of a and b
-a/b     - Quotient of a and b
-a^b     - a raised to the power of b
-sin(x)  - Sin of x
-cos(x)  - Cos of x
-tan(x)  - Tan of x
-csc(x)  - Csc of x
-sec(x)  - Sec of x
-cot(x)  - Cot of x
-asin(x) - Arcsin of x
-acos(x) - Arccos of x
-atan(x) - Arctan of x
-acsc(x) - Arccsc of x
-asec(x) - Arcsec of x
-acot(x) - Arccot of x
-abs(x)  - Absolute value of x
-sqrt(x) - Square root of x
-rad(x)  - Degrees to radians
-deg(x)  - Radians to degrees
+
+Commands:
+  help         - Displays this message
+  memory       - Shows all variables in memory
+
+Math Functions:
+  a+b, a-b, a*b, a/b, a^b
+  sin(x), cos(x), tan(x), csc(x), sec(x), cot(x), 
+  asin(x), acos(x), atan(x), acsc(x), asec(x), acot(x), 
+  abs(x), sqrt(x), rad(x), deg(x)
+
+Special Variables:
+  SHOW_TOKENS  - If nonzero, will show the found tokens after parsing an expression.
 """
 
 
@@ -56,21 +66,22 @@ def tokenize(inp: str) -> list:
     index = 0
     while index < len(inp):
         c = inp[index]
-        if c in BASE_TOKENS:
-            out.append(c)
-        elif c.isnumeric() or c == ".":
+        if c.isnumeric() or c == ".":
             num = ""
             while index < len(inp) and (inp[index].isnumeric() or inp[index] == "."):
                 num += inp[index]
                 index += 1
             index -= 1
             try:
-                out.append(float(num))
+                f = float(num)
+                out.append(f)
             except ValueError:
                 raise IOError("Invalid number " + str(num) + ".")
+        elif c in BASE_TOKENS:
+            out.append(c)
         elif c.isalpha():
             ident = ""
-            while index < len(inp) and inp[index].isalpha():
+            while index < len(inp) and (inp[index].isalpha() or inp[index] == "_"):
                 ident += inp[index]
                 index += 1
             index -= 1
@@ -81,6 +92,21 @@ def tokenize(inp: str) -> list:
             raise IOError("Invalid character \"" + str(c) + "\".")
         index += 1
     return out
+
+
+def parse_stmnt(tokens):
+    if shell_functions.__contains__(tokens[0]):
+        shell_functions[tokens[0]]()
+    elif len(tokens) >= 3 and (type(tokens[0]) is str and tokens[1] == '='):  # identifier = expression
+        name = tokens.pop(0)
+        if defined_functions.__contains__(name):
+            raise IOError("Invalid variable name, already used as function")
+        tokens.pop(0)  # remove =
+        val = parse_eq(tokens)
+        memory[name] = val
+        print(str(name) + " = " + str(val))
+    else:
+        print("= " + str(parse_eq(tokens)))
 
 
 def parse_eq(tokens) -> float:
@@ -123,9 +149,12 @@ def parse_term(tokens) -> float:
                             raise IOError("Division by zero.")
                     else:
                         raise IOError("Invalid operation " + str(op) + ".")
-                else:
+                elif type(tokens[0]) is float or tokens[0] == '(' or \
+                        defined_functions.__contains__(tokens[0]) or memory.__contains__(tokens[0]):
                     nex = parse_pow(tokens)
                     v = v * nex
+                else:
+                    break
             else:
                 break
         except IndexError:
@@ -134,13 +163,13 @@ def parse_term(tokens) -> float:
 
 
 def parse_pow(tokens) -> float:
-    v = parse_value(tokens)
+    v = parse_value(tokens, True)
     while True:
         try:
             if len(tokens) > 0:
                 if tokens[0] in POWOP:
                     op = tokens.pop(0)
-                    nex = parse_value(tokens)
+                    nex = parse_value(tokens, False)
                     if op == "^":
                         v = math.pow(v, nex)
                     else:
@@ -154,11 +183,13 @@ def parse_pow(tokens) -> float:
     return v
 
 
-def parse_value(tokens) -> float:
+def parse_value(tokens, begin: bool) -> float:
     try:
         n = tokens.pop(0)
         if type(n) is float:
             return n
+        if begin and n == '-':
+            return -tokens.pop(0)
         elif n == "(":
             inner = []
             nest = 1
@@ -175,6 +206,8 @@ def parse_value(tokens) -> float:
             if defined_functions.__contains__(n):
                 nex = parse_pow(tokens)
                 return defined_functions[n](nex)
+            elif memory.__contains__(n):
+                return memory[n]
             else:
                 raise IOError("Unrecognized function \"" + str(n) + "\".")
         else:
@@ -187,15 +220,12 @@ print("Type expressions, or \"help\" for info:")
 while True:
     statement = input("――――――――――――――――――――――――――――――――――――――――――――――――――\n")
     if len(statement) > 0:
-        if statement == "help":
-            print(helpMsg)
-        else:
-            try:
-                tks = tokenize(statement)
-                output = parse_eq(tks)
-                print("= " + str(output))
-            except IOError as e:
-                print("Exception while parsing expression: \n" + str(e))
+        try:
+            tks = tokenize(statement)
+            if memory["SHOW_TOKENS"]:
+                print(tks)
+            output = parse_stmnt(tks)
+        except IOError as e:
+            print("Exception while parsing expression: \n" + str(e))
     else:
         break
-

@@ -7,14 +7,21 @@ def parse_stmnt(tokens):
         shell.commands[tokens[0]]()
     elif len(tokens) >= 3 and (type(tokens[0]) is str and tokens[1] == '='):  # identifier = expression
         name = tokens.pop(0)
-        if shell.functions.__contains__(name) or shell.constants.__contains__(name):
-            raise IOError("Invalid variable name, already used as function / constant")
+        if (not (type(name) is str)) or tokenizer.BASE_TOKENS.__contains__(name):
+            raise IOError("Invalid variable name, already used as a token")
+        if shell.constants.__contains__(name):
+            raise IOError("Invalid variable name, already used as constant")
+        if shell.functions.__contains__(name):
+            raise IOError("Invalid variable name, already used as function")
         tokens.pop(0)  # remove =
         val = parse_eq(tokens)
         shell.memory[name] = val
+        shell.constants["ANS"] = val
         print(str(name) + " = " + str(val))
     else:
-        print("= " + str(parse_eq(tokens)))
+        val = parse_eq(tokens)
+        shell.constants["ANS"] = val
+        print("= " + str(val))
 
 
 def parse_eq(tokens) -> float:
@@ -32,7 +39,7 @@ def parse_eq(tokens) -> float:
                     else:
                         raise IOError("Invalid operation " + str(op) + ".")
                 else:
-                    break
+                    raise IOError("Unexpected token \"" + str(tokens[0]) + "\"")
             else:
                 break
         except IndexError:

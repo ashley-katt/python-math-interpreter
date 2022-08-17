@@ -1,5 +1,5 @@
 import math
-
+import os
 
 memory = {
     "SHOW_TOKENS": 0
@@ -10,6 +10,7 @@ constants = {
     "E": math.e,
     "TRUE": 1,
     "FALSE": 0,
+    "ANS": 0,
 }
 
 
@@ -28,8 +29,14 @@ Math Functions:
   asin(x), acos(x), atan(x), acsc(x), asec(x), acot(x), 
   abs(x), sqrt(x), rad(x), deg(x)
 
-Special Variables:
+Special Variables / Constants:
   SHOW_TOKENS  - If nonzero, will show the found tokens after parsing an expression.
+  ANS          - Always equal to the result of the last statement.
+  E            - Math constant E
+  PI           - Math constant PI
+  TAU          - Math constant TAU
+  TRUE         - 1
+  FALSE        - 0
 """
 
 
@@ -38,9 +45,16 @@ def memory_cmd():
         print(str(m) + " = " + str(memory[m]))
 
 
+def clear_cmd():
+    for _ in range(0, 100):
+        print("\n")
+
+
+
 commands = {
     "help": help_cmd,
     "memory": memory_cmd,
+    "clear": clear_cmd,
 }
 
 functions = {

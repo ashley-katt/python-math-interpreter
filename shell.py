@@ -1,5 +1,4 @@
 import math
-import os
 
 memory = {
     "SHOW_TOKENS": 0
@@ -46,9 +45,10 @@ def memory_cmd():
 
 
 def clear_cmd():
+    msg = ""
     for _ in range(0, 100):
-        print("\n")
-
+        msg = msg + "\n"
+    print(msg)
 
 
 commands = {

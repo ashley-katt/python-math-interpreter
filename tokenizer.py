@@ -35,3 +35,8 @@ def tokenize(inp: str) -> list:
             raise IOError("Invalid character \"" + str(c) + "\".")
         index += 1
     return out
+
+
+# BASE_TOKENS = /(\(|\)|\+|-|\*|/|^|=)/
+# NUM         = /\d*(\.\d+)?/
+# IDENTIFIER  = /[a-zA-Z][a-zA-Z_]*/

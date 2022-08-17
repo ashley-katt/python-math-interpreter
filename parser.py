@@ -131,3 +131,20 @@ def parse_value(tokens, begin: bool) -> float:
             raise IOError("Invalid token " + str(tokens[0]) + ".")
     except IndexError:
         raise IOError("Unexpected end of expression.")
+
+
+# statement                = expression | vardef
+# vardef                   = IDENTIFIER, EQUALS, expression
+#
+# expression               = term, {addop, term}
+# term                     = pow, {mulop, pow}
+# pow                      = value, {expop, value }
+# value                    = NUMBER | OPENPAREN, expression, CLOSEPAREN
+#
+# addop                    = PLUS | SUB
+# mulop                    = MULT | DIVIDE
+# expop                    = CARET
+
+
+
+
